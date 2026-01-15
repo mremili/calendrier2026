@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda - Déplacements Les Ombres</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background: #fff;
+            color: #3c4043;
+            font-size: 14px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid #dadce0;
+            height: 64px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-btn:hover {
+            background: #f1f3f4;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            color: #5f6368;
+        }
+
+        .today-btn {
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 8px 16px;
+            background: #fff;
+            color: #3c4043;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: 24px;
+        }
+
+        .today-btn:hover {
+            background: #f1f3f4;
+        }
+
+        .nav-arrows {
+            display: flex;
+            align-items: center;
+            margin-left: 8px;
+        }
+
+        .nav-arrows button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+        }
+
+        .nav-arrows button:hover {
+            background: #f1f3f4;
+        }
+
+        .current-period {
+            font-size: 22px;
+            color: #3c4043;
+            margin-left: 16px;
+            font-weight: 400;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .view-selector {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 8px 12px;
+            background: #fff;
+            cursor: pointer;
+            gap: 8px;
+        }
+
+        .view-selector:hover {
+            background: #f1f3f4;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+        }
+
+        .icon-btn:hover {
+            background: #f1f3f4;
+        }
+
+        /* Layout */
+        .main-container {
+            display: flex;
+            margin-top: 64px;
+            height: calc(100vh - 64px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 256px;
+            padding: 16px;
+            border-right: 1px solid #dadce0;
+            overflow-y: auto;
+        }
+
+        .sync-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border-radius: 24px;
+            border: none;
+            background: #fff;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302), 0 1px 3px 1px rgba(60,64,67,0.149);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3c4043;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+
+        .sync-btn:hover {
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.302), 0 4px 8px 3px rgba(60,64,67,0.149);
+        }
+
+        .sync-btn .material-icons-outlined {
+            font-size: 24px;
+        }
+
+        .sync-btn.connected .material-icons-outlined {
+            color: #34a853;
+        }
+
+        .sync-btn.demo .material-icons-outlined {
+            color: #ea4335;
+        }
+
+        .sync-btn.loading .material-icons-outlined {
+            color: #fbbc05;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mini Calendar */
+        .mini-calendar {
+            margin-bottom: 24px;
+        }
+
+        .mini-cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .mini-cal-header h3 {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .mini-cal-nav {
+            display: flex;
+        }
+
+        .mini-cal-nav button {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mini-cal-nav button:hover {
+            background: #f1f3f4;
+        }
+
+        .mini-cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .mini-cal-grid .day-name {
+            padding: 4px;
+            color: #70757a;
+            font-weight: 500;
+        }
+
+        .mini-cal-grid .day {
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+        }
+
+        .mini-cal-grid .day:hover {
+            background: #f1f3f4;
+        }
+
+        .mini-cal-grid .day.today {
+            background: #1a73e8;
+            color: #fff;
+        }
+
+        .mini-cal-grid .day.other-month {
+            color: #70757a;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            border-top: 1px solid #dadce0;
+            padding-top: 16px;
+        }
+
+        .filter-section h4 {
+            font-size: 11px;
+            font-weight: 500;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-item:hover {
+            background: #f1f3f4;
+        }
+
+        .filter-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 2px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+        }
+
+        .filter-checkbox.checked {
+            background: currentColor;
+            color: inherit;
+        }
+
+        .filter-checkbox.checked::after {
+            content: '✓';
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Couleurs personnes */
+        .color-carla { color: #4285f4; border-color: #4285f4; }
+        .color-pierre { color: #ea4335; border-color: #ea4335; }
+        .color-clement { color: #34a853; border-color: #34a853; }
+        .color-camille { color: #fbbc05; border-color: #fbbc05; }
+        .color-nathan { color: #9334e6; border-color: #9334e6; }
+
+        /* Calendar Grid */
+        .calendar-container {
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* Week View */
+        .week-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .week-header {
+            display: grid;
+            grid-template-columns: 56px repeat(7, 1fr);
+            border-bottom: 1px solid #dadce0;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .week-header-cell {
+            text-align: center;
+            padding: 8px 0;
+            border-left: 1px solid #dadce0;
+        }
+
+        .week-header-cell:first-child {
+            border-left: none;
+        }
+
+        .week-header-cell .day-name {
+            font-size: 11px;
+            color: #70757a;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .week-header-cell .day-number {
+            font-size: 26px;
+            color: #70757a;
+            margin-top: 4px;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px auto 0;
+            border-radius: 50%;
+        }
+
+        .week-header-cell .day-number.today {
+            background: #1a73e8;
+            color: #fff;
+        }
+
+        .week-header-cell .day-name.today {
+            color: #1a73e8;
+        }
+
+        .week-body {
+            display: grid;
+            grid-template-columns: 56px repeat(7, 1fr);
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .time-column {
+            border-right: 1px solid #dadce0;
+        }
+
+        .time-slot-label {
+            height: 48px;
+            font-size: 10px;
+            color: #70757a;
+            text-align: right;
+            padding-right: 8px;
+            position: relative;
+            top: -6px;
+        }
+
+        .day-column {
+            border-left: 1px solid #dadce0;
+            position: relative;
+        }
+
+        .hour-line {
+            height: 48px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .hour-line.on-hour {
+            border-bottom: 1px solid #dadce0;
+        }
+
+        /* Events */
+        .event {
+            position: absolute;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 11px;
+            color: #fff;
+            overflow: hidden;
+            cursor: pointer;
+            z-index: 1;
+            box-sizing: border-box;
+        }
+
+        .event:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+
+        .event-title {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-location {
+            font-size: 10px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-time {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        /* Month View */
+        .month-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .month-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border-bottom: 1px solid #dadce0;
+            background: #fff;
+            position: sticky;
+            top: 0;
+        }
+
+        .month-header-cell {
+            text-align: center;
+            padding: 12px 0;
+            font-size: 11px;
+            color: #70757a;
+            text-transform: uppercase;
+            font-weight: 500;
+            border-left: 1px solid #dadce0;
+        }
+
+        .month-header-cell:first-child {
+            border-left: none;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            flex: 1;
+        }
+
+        .month-day-cell {
+            border-left: 1px solid #dadce0;
+            border-bottom: 1px solid #dadce0;
+            padding: 4px;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .month-day-cell:nth-child(7n+1) {
+            border-left: none;
+        }
+
+        .month-day-number {
+            font-size: 12px;
+            color: #70757a;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-bottom: 4px;
+        }
+
+        .month-day-number.today {
+            background: #1a73e8;
+            color: #fff;
+        }
+
+        .month-day-number.other-month {
+            color: #dadce0;
+        }
+
+        .month-event {
+            font-size: 11px;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .month-event:hover {
+            filter: brightness(0.9);
+        }
+
+        /* View Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .view-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px 2px rgba(60,64,67,0.149);
+            min-width: 150px;
+            z-index: 200;
+            display: none;
+            padding: 8px 0;
+        }
+
+        .view-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f3f4;
+        }
+
+        .dropdown-item.active {
+            background: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .current-period {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn">
+                <span class="material-icons-outlined">menu</span>
+            </button>
+            <div class="logo">
+                <div class="logo-icon" id="logo-day">15</div>
+                <span class="logo-text">Agenda</span>
+            </div>
+            <button class="today-btn" onclick="goToToday()">Aujourd'hui</button>
+            <div class="nav-arrows">
+                <button onclick="navigate(-1)">
+                    <span class="material-icons-outlined">chevron_left</span>
+                </button>
+                <button onclick="navigate(1)">
+                    <span class="material-icons-outlined">chevron_right</span>
+                </button>
+            </div>
+            <span class="current-period" id="current-period">Janvier 2026</span>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn">
+                <span class="material-icons-outlined">search</span>
+            </button>
+            <button class="icon-btn">
+                <span class="material-icons-outlined">help_outline</span>
+            </button>
+            <button class="icon-btn">
+                <span class="material-icons-outlined">settings</span>
+            </button>
+            <div class="dropdown">
+                <button class="view-selector" onclick="toggleViewMenu()">
+                    <span id="current-view-label">Semaine</span>
+                    <span class="material-icons-outlined" style="font-size: 18px;">arrow_drop_down</span>
+                </button>
+                <div class="view-menu" id="view-menu">
+                    <div class="dropdown-item" onclick="setView('day')">Jour</div>
+                    <div class="dropdown-item active" onclick="setView('week')">Semaine</div>
+                    <div class="dropdown-item" onclick="setView('month')">Mois</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="sync-btn loading" id="sync-btn" onclick="loadFromGoogleSheet()">
+                <span class="material-icons-outlined">sync</span>
+                <span id="sync-label">Chargement...</span>
+            </button>
+
+            <!-- Mini Calendar -->
+            <div class="mini-calendar">
+                <div class="mini-cal-header">
+                    <h3 id="mini-cal-month">Janvier 2026</h3>
+                    <div class="mini-cal-nav">
+                        <button onclick="miniCalNavigate(-1)">
+                            <span class="material-icons-outlined" style="font-size: 18px;">chevron_left</span>
+                        </button>
+                        <button onclick="miniCalNavigate(1)">
+                            <span class="material-icons-outlined" style="font-size: 18px;">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="mini-cal-grid" id="mini-cal-grid"></div>
+            </div>
+
+            <!-- Filtres Personnes -->
+            <div class="filter-section">
+                <h4>Personnes</h4>
+                <div class="filter-item" onclick="toggleFilter('Carla')">
+                    <div class="filter-checkbox color-carla checked" id="filter-Carla"></div>
+                    <span>Carla</span>
+                </div>
+                <div class="filter-item" onclick="toggleFilter('Pierre')">
+                    <div class="filter-checkbox color-pierre checked" id="filter-Pierre"></div>
+                    <span>Pierre</span>
+                </div>
+                <div class="filter-item" onclick="toggleFilter('Clément')">
+                    <div class="filter-checkbox color-clement checked" id="filter-Clément"></div>
+                    <span>Clément</span>
+                </div>
+                <div class="filter-item" onclick="toggleFilter('Camille')">
+                    <div class="filter-checkbox color-camille checked" id="filter-Camille"></div>
+                    <span>Camille</span>
+                </div>
+                <div class="filter-item" onclick="toggleFilter('Nathan')">
+                    <div class="filter-checkbox color-nathan checked" id="filter-Nathan"></div>
+                    <span>Nathan</span>
+                </div>
+            </div>
+
+            <!-- Filtres Territoires -->
+            <div class="filter-section" style="margin-top: 16px;">
+                <h4>Territoires</h4>
+                <div class="filter-item" onclick="toggleTerritoryFilter('Lille')">
+                    <div class="filter-checkbox checked" id="filter-Lille" style="border-color: #5f6368; color: #5f6368;"></div>
+                    <span>Lille</span>
+                </div>
+                <div class="filter-item" onclick="toggleTerritoryFilter('Marseille')">
+                    <div class="filter-checkbox checked" id="filter-Marseille" style="border-color: #5f6368; color: #5f6368;"></div>
+                    <span>Marseille</span>
+                </div>
+                <div class="filter-item" onclick="toggleTerritoryFilter('Nice')">
+                    <div class="filter-checkbox checked" id="filter-Nice" style="border-color: #5f6368; color: #5f6368;"></div>
+                    <span>Nice</span>
+                </div>
+                <div class="filter-item" onclick="toggleTerritoryFilter('Montpellier')">
+                    <div class="filter-checkbox checked" id="filter-Montpellier" style="border-color: #5f6368; color: #5f6368;"></div>
+                    <span>Montpellier</span>
+                </div>
+                <div class="filter-item" onclick="toggleTerritoryFilter('Bordeaux')">
+                    <div class="filter-checkbox checked" id="filter-Bordeaux" style="border-color: #5f6368; color: #5f6368;"></div>
+                    <span>Bordeaux</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Calendar -->
+        <main class="calendar-container" id="calendar-container">
+        </main>
+    </div>
+
+    <script>
+        // Configuration Google Sheets - Lien de PUBLICATION
+        const SHEET_PUB_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2IfW-CHtj-tFumwexqbpm9VmCwzQkM6ejpBEhHedv_lWPYpM9jpksq1XQJLLyHg/pub';
+        const SHEET_GID = '815454037';
+
+        // State
+        let currentDate = new Date();
+        let currentView = 'week';
+        let allEvents = [];
+        let filters = {
+            persons: ['Carla', 'Pierre', 'Clément', 'Camille', 'Nathan'],
+            territories: ['Lille', 'Marseille', 'Nice', 'Montpellier', 'Bordeaux']
+        };
+
+        // Couleurs par personne
+        const personColors = {
+            'Carla': '#4285f4',
+            'Pierre': '#ea4335',
+            'Clément': '#34a853',
+            'Camille': '#fbbc05',
+            'Nathan': '#9334e6'
+        };
+
+        // Données de démonstration
+        const demoData = [
+            { person: 'Carla', territory: 'Lille', date: '2026-01-12', week: 'S2', startTime: '09:00', endTime: '17:00' },
+            { person: 'Clément', territory: 'Lille', date: '2026-01-12', week: 'S2', startTime: '09:00', endTime: '17:00' },
+            { person: 'Camille', territory: 'Bordeaux', date: '2026-01-19', week: 'S3', startTime: '09:00', endTime: '17:00' },
+            { person: 'Nathan', territory: 'Bordeaux', date: '2026-01-19', week: 'S3', startTime: '09:00', endTime: '17:00' },
+            { person: 'Clément', territory: 'Marseille', date: '2026-01-26', week: 'S4', startTime: '09:00', endTime: '17:00' },
+            { person: 'Pierre', territory: 'Marseille', date: '2026-01-26', week: 'S4', startTime: '09:00', endTime: '17:00' },
+        ];
+
+        // Parser CSV
+        function parseCSVRow(row) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // Charger depuis Google Sheets
+        async function loadFromGoogleSheet() {
+            const syncBtn = document.getElementById('sync-btn');
+            const syncLabel = document.getElementById('sync-label');
+
+            syncBtn.className = 'sync-btn loading';
+            syncLabel.textContent = 'Chargement...';
+
+            try {
+                const url = `${SHEET_PUB_URL}?gid=${SHEET_GID}&single=true&output=csv`;
+                console.log('Chargement depuis:', url);
+
+                const response = await fetch(url);
+
+                if (!response.ok) throw new Error('Sheet non accessible: ' + response.status);
+
+                const csv = await response.text();
+                console.log('CSV reçu, longueur:', csv.length);
+
+                if (!csv || csv.length < 50) throw new Error('CSV vide');
+
+                const lines = csv.split('\n');
+                console.log('Nombre de lignes:', lines.length);
+
+                // Structure du Sheet:
+                // Ligne 1: Titre
+                // Ligne 2-4: Instructions
+                // Ligne 5: Headers
+                // Ligne 6+: Données
+                // Colonnes: A=Personne, B=Mois, C=Semaine, D=Date prévue, E=Date réelle, F=Destination, etc.
+
+                const events = [];
+
+                for (let i = 5; i < lines.length; i++) {
+                    const row = parseCSVRow(lines[i]);
+
+                    if (row.length > 5 && row[0] && row[0].trim() !== '') {
+                        const person = row[0]?.trim();
+                        const week = row[2]?.trim();
+                        const datePrevue = row[3]?.trim() || '';
+                        const dateReelle = row[4]?.trim() || '';
+                        const destination = row[5]?.trim();
+
+                        if (!person || !destination) continue;
+
+                        // Priorité : Date réelle > Date prévue
+                        let dateStr = dateReelle || datePrevue;
+
+                        // Convertir DD/MM/YYYY en YYYY-MM-DD si nécessaire
+                        if (dateStr.includes('/')) {
+                            const parts = dateStr.split('/');
+                            if (parts.length === 3) {
+                                dateStr = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                            }
+                        }
+
+                        events.push({
+                            person: person,
+                            territory: destination,
+                            date: dateStr,
+                            week: week,
+                            startTime: '09:00',
+                            endTime: '17:00'
+                        });
+                    }
+                }
+
+                console.log('Événements chargés:', events.length);
+
+                if (events.length > 0) {
+                    allEvents = events;
+                    syncBtn.className = 'sync-btn connected';
+                    syncLabel.textContent = events.length + ' missions';
+                } else {
+                    throw new Error('Aucun événement trouvé');
+                }
+
+            } catch (error) {
+                console.log('Erreur ou mode démo:', error.message);
+                allEvents = demoData;
+                syncBtn.className = 'sync-btn demo';
+                syncLabel.textContent = 'Mode démo';
+            }
+
+            renderMiniCalendar();
+            renderCalendar();
+            updatePeriodLabel();
+            updateLogoDay();
+        }
+
+        // Navigation
+        function navigate(direction) {
+            if (currentView === 'week') {
+                currentDate.setDate(currentDate.getDate() + (direction * 7));
+            } else if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() + direction);
+            } else if (currentView === 'day') {
+                currentDate.setDate(currentDate.getDate() + direction);
+            }
+            renderCalendar();
+            renderMiniCalendar();
+            updatePeriodLabel();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+            renderMiniCalendar();
+            updatePeriodLabel();
+        }
+
+        function miniCalNavigate(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderMiniCalendar();
+            updatePeriodLabel();
+        }
+
+        // Vue
+        function setView(view) {
+            currentView = view;
+            document.getElementById('current-view-label').textContent =
+                view === 'week' ? 'Semaine' :
+                view === 'month' ? 'Mois' :
+                view === 'day' ? 'Jour' : view;
+
+            document.querySelectorAll('.view-menu .dropdown-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            toggleViewMenu();
+            renderCalendar();
+            updatePeriodLabel();
+        }
+
+        function toggleViewMenu() {
+            document.getElementById('view-menu').classList.toggle('show');
+        }
+
+        // Filters
+        function toggleFilter(person) {
+            const checkbox = document.getElementById('filter-' + person);
+            checkbox.classList.toggle('checked');
+
+            if (filters.persons.includes(person)) {
+                filters.persons = filters.persons.filter(p => p !== person);
+            } else {
+                filters.persons.push(person);
+            }
+            renderCalendar();
+        }
+
+        function toggleTerritoryFilter(territory) {
+            const checkbox = document.getElementById('filter-' + territory);
+            checkbox.classList.toggle('checked');
+
+            if (filters.territories.includes(territory)) {
+                filters.territories = filters.territories.filter(t => t !== territory);
+            } else {
+                filters.territories.push(territory);
+            }
+            renderCalendar();
+        }
+
+        // Get filtered events
+        function getFilteredEvents() {
+            return allEvents.filter(e =>
+                filters.persons.includes(e.person) &&
+                filters.territories.includes(e.territory)
+            );
+        }
+
+        // Update period label
+        function updatePeriodLabel() {
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+
+            if (currentView === 'week') {
+                const startOfWeek = getStartOfWeek(currentDate);
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+                if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
+                    document.getElementById('current-period').textContent =
+                        `${months[startOfWeek.getMonth()]} ${startOfWeek.getFullYear()}`;
+                } else {
+                    document.getElementById('current-period').textContent =
+                        `${months[startOfWeek.getMonth()]} – ${months[endOfWeek.getMonth()]} ${endOfWeek.getFullYear()}`;
+                }
+            } else {
+                document.getElementById('current-period').textContent =
+                    `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            }
+
+            document.getElementById('mini-cal-month').textContent =
+                `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        }
+
+        // Update logo day
+        function updateLogoDay() {
+            const today = new Date();
+            document.getElementById('logo-day').textContent = today.getDate();
+        }
+
+        // Get start of week (Sunday)
+        function getStartOfWeek(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            d.setDate(d.getDate() - day);
+            return d;
+        }
+
+        // Format date
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Mini calendar
+        function renderMiniCalendar() {
+            const grid = document.getElementById('mini-cal-grid');
+            grid.innerHTML = '';
+
+            const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+            dayNames.forEach(name => {
+                const cell = document.createElement('div');
+                cell.className = 'day-name';
+                cell.textContent = name;
+                grid.appendChild(cell);
+            });
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const today = new Date();
+
+            // Previous month days
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                const prevDate = new Date(year, month, -firstDay.getDay() + i + 1);
+                const cell = document.createElement('div');
+                cell.className = 'day other-month';
+                cell.textContent = prevDate.getDate();
+                grid.appendChild(cell);
+            }
+
+            // Current month days
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day';
+                cell.textContent = day;
+
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cell.classList.add('today');
+                }
+
+                cell.onclick = () => {
+                    currentDate = new Date(year, month, day);
+                    renderCalendar();
+                    updatePeriodLabel();
+                };
+
+                grid.appendChild(cell);
+            }
+
+            // Next month days
+            const remaining = 42 - grid.children.length;
+            for (let day = 1; day <= remaining; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day other-month';
+                cell.textContent = day;
+                grid.appendChild(cell);
+            }
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const container = document.getElementById('calendar-container');
+
+            if (currentView === 'week') {
+                renderWeekView(container);
+            } else if (currentView === 'month') {
+                renderMonthView(container);
+            } else if (currentView === 'day') {
+                renderDayView(container);
+            }
+        }
+
+        // Week view
+        function renderWeekView(container) {
+            const startOfWeek = getStartOfWeek(currentDate);
+            const dayNames = ['DIM.', 'LUN.', 'MAR.', 'MER.', 'JEU.', 'VEN.', 'SAM.'];
+            const today = new Date();
+
+            let html = '<div class="week-view">';
+
+            // Header
+            html += '<div class="week-header">';
+            html += '<div class="week-header-cell" style="border-left: none;"><div style="font-size: 10px; color: #70757a; padding: 8px;">GMT+01</div></div>';
+
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+                const isToday = day.toDateString() === today.toDateString();
+
+                html += `<div class="week-header-cell">
+                    <div class="day-name ${isToday ? 'today' : ''}">${dayNames[i]}</div>
+                    <div class="day-number ${isToday ? 'today' : ''}">${day.getDate()}</div>
+                </div>`;
+            }
+            html += '</div>';
+
+            // Time grid
+            html += '<div class="week-body">';
+
+            // Time column
+            html += '<div class="time-column">';
+            for (let hour = 0; hour < 24; hour++) {
+                const displayLabel = hour === 0 ? '' : (hour < 12 ? `${hour} AM` : (hour === 12 ? '12 PM' : `${hour - 12} PM`));
+                html += `<div class="time-slot-label">${displayLabel}</div>`;
+            }
+            html += '</div>';
+
+            // Day columns
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+                const dateStr = formatDate(day);
+
+                // Get events for this day
+                const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
+                const eventCount = dayEvents.length;
+
+                html += `<div class="day-column" style="position: relative;">`;
+
+                // Hour lines
+                for (let hour = 0; hour < 24; hour++) {
+                    html += `<div class="hour-line ${hour % 1 === 0 ? 'on-hour' : ''}"></div>`;
+                }
+
+                // Events - côte à côte comme Google Agenda
+                dayEvents.forEach((event, idx) => {
+                    const startHour = parseInt(event.startTime?.split(':')[0] || 9);
+                    const endHour = parseInt(event.endTime?.split(':')[0] || 17);
+                    const top = startHour * 48;
+                    const height = (endHour - startHour) * 48;
+                    const color = personColors[event.person] || '#4285f4';
+
+                    // Calculer largeur et position pour événements côte à côte
+                    const width = eventCount > 1 ? (100 / eventCount) : 100;
+                    const left = eventCount > 1 ? (idx * 100 / eventCount) : 0;
+
+                    html += `<div class="event" style="
+                        top: ${top}px;
+                        height: ${height}px;
+                        background: ${color};
+                        width: calc(${width}% - 4px);
+                        left: calc(${left}% + 2px);
+                    ">
+                        <div class="event-title">${event.person}</div>
+                        <div class="event-location">📍 ${event.territory}</div>
+                        <div class="event-time">${event.startTime || '9:00'} - ${event.endTime || '17:00'}</div>
+                    </div>`;
+                });
+
+                html += '</div>';
+            }
+
+            html += '</div></div>';
+
+            container.innerHTML = html;
+        }
+
+        // Month view
+        function renderMonthView(container) {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const today = new Date();
+
+            const dayNames = ['DIM.', 'LUN.', 'MAR.', 'MER.', 'JEU.', 'VEN.', 'SAM.'];
+
+            let html = '<div class="month-view">';
+
+            // Header
+            html += '<div class="month-header">';
+            dayNames.forEach(name => {
+                html += `<div class="month-header-cell">${name}</div>`;
+            });
+            html += '</div>';
+
+            // Grid
+            html += '<div class="month-grid">';
+
+            // Previous month
+            for (let i = 0; i < firstDay.getDay(); i++) {
+                const prevDate = new Date(year, month, -firstDay.getDay() + i + 1);
+                html += `<div class="month-day-cell">
+                    <div class="month-day-number other-month">${prevDate.getDate()}</div>
+                </div>`;
+            }
+
+            // Current month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateStr = formatDate(date);
+                const isToday = date.toDateString() === today.toDateString();
+                const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
+
+                html += `<div class="month-day-cell">
+                    <div class="month-day-number ${isToday ? 'today' : ''}">${day}</div>`;
+
+                dayEvents.slice(0, 3).forEach(event => {
+                    const color = personColors[event.person] || '#4285f4';
+                    html += `<div class="month-event" style="background: ${color};">
+                        ${event.person} - ${event.territory}
+                    </div>`;
+                });
+
+                if (dayEvents.length > 3) {
+                    html += `<div style="font-size: 10px; color: #70757a; padding-left: 4px;">+${dayEvents.length - 3} autres</div>`;
+                }
+
+                html += '</div>';
+            }
+
+            // Next month
+            const totalCells = Math.ceil((firstDay.getDay() + lastDay.getDate()) / 7) * 7;
+            const remaining = totalCells - firstDay.getDay() - lastDay.getDate();
+            for (let day = 1; day <= remaining; day++) {
+                html += `<div class="month-day-cell">
+                    <div class="month-day-number other-month">${day}</div>
+                </div>`;
+            }
+
+            html += '</div></div>';
+
+            container.innerHTML = html;
+        }
+
+        // Day view
+        function renderDayView(container) {
+            const dateStr = formatDate(currentDate);
+            const dayEvents = getFilteredEvents().filter(e => e.date === dateStr);
+            const eventCount = dayEvents.length;
+            const today = new Date();
+            const isToday = currentDate.toDateString() === today.toDateString();
+            const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+            let html = '<div class="week-view">';
+
+            // Header
+            html += '<div class="week-header" style="grid-template-columns: 56px 1fr;">';
+            html += '<div class="week-header-cell" style="border-left: none;"><div style="font-size: 10px; color: #70757a; padding: 8px;">GMT+01</div></div>';
+            html += `<div class="week-header-cell">
+                <div class="day-name ${isToday ? 'today' : ''}">${dayNames[currentDate.getDay()]}</div>
+                <div class="day-number ${isToday ? 'today' : ''}">${currentDate.getDate()}</div>
+            </div>`;
+            html += '</div>';
+
+            // Time grid
+            html += '<div class="week-body" style="grid-template-columns: 56px 1fr;">';
+
+            // Time column
+            html += '<div class="time-column">';
+            for (let hour = 0; hour < 24; hour++) {
+                const displayLabel = hour === 0 ? '' : (hour < 12 ? `${hour} AM` : (hour === 12 ? '12 PM' : `${hour - 12} PM`));
+                html += `<div class="time-slot-label">${displayLabel}</div>`;
+            }
+            html += '</div>';
+
+            // Day column
+            html += '<div class="day-column" style="position: relative;">';
+            for (let hour = 0; hour < 24; hour++) {
+                html += `<div class="hour-line on-hour"></div>`;
+            }
+
+            dayEvents.forEach((event, idx) => {
+                const startHour = parseInt(event.startTime?.split(':')[0] || 9);
+                const endHour = parseInt(event.endTime?.split(':')[0] || 17);
+                const top = startHour * 48;
+                const height = (endHour - startHour) * 48;
+                const color = personColors[event.person] || '#4285f4';
+
+                const width = eventCount > 1 ? (100 / eventCount) : 100;
+                const left = eventCount > 1 ? (idx * 100 / eventCount) : 0;
+
+                html += `<div class="event" style="
+                    top: ${top}px;
+                    height: ${height}px;
+                    background: ${color};
+                    width: calc(${width}% - 4px);
+                    left: calc(${left}% + 2px);
+                ">
+                    <div class="event-title">${event.person}</div>
+                    <div class="event-location">📍 ${event.territory}</div>
+                    <div class="event-time">${event.startTime || '9:00'} - ${event.endTime || '17:00'}</div>
+                </div>`;
+            });
+
+            html += '</div></div></div>';
+
+            container.innerHTML = html;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('view-menu').classList.remove('show');
+            }
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromGoogleSheet();
+        });
+    </script>
+</body>
+</html>
